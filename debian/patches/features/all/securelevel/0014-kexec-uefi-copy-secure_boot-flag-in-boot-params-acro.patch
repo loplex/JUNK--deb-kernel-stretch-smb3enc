@@ -1,8 +1,8 @@
 From: Dave Young <dyoung@redhat.com>
 Date: Tue, 6 Oct 2015 13:31:31 +0100
-Subject: [15/18] kexec/uefi: copy secure_boot flag in boot params across kexec
- reboot
-Origin: https://github.com/mjg59/linux/commit/4b2b64d5a6ebc84214755ebccd599baef7c1b798
+Subject: [PATCH 14/19] kexec/uefi: copy secure_boot flag in boot params across
+ kexec reboot
+Origin: https://git.kernel.org/cgit/linux/kernel/git/jforbes/linux.git/commit?id=1bdfef5d7f72c58330fa1bbefa8cf12241a64920
 
 Kexec reboot in case secure boot being enabled does not keep the secure
 boot mode in new kernel, so later one can load unsigned kernel via legacy
@@ -19,10 +19,10 @@ Signed-off-by: Dave Young <dyoung@redhat.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/arch/x86/kernel/kexec-bzimage64.c b/arch/x86/kernel/kexec-bzimage64.c
-index 2af478e3fd4e..61827eeb6881 100644
+index 3407b148c240..b843a4e57a9b 100644
 --- a/arch/x86/kernel/kexec-bzimage64.c
 +++ b/arch/x86/kernel/kexec-bzimage64.c
-@@ -180,6 +180,7 @@ setup_efi_state(struct boot_params *params, unsigned long params_load_addr,
+@@ -179,6 +179,7 @@ setup_efi_state(struct boot_params *params, unsigned long params_load_addr,
  	if (efi_enabled(EFI_OLD_MEMMAP))
  		return 0;
  

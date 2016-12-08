@@ -1,7 +1,7 @@
 From: Linn Crosetto <linn@hpe.com>
 Date: Fri, 4 Mar 2016 16:08:24 -0700
-Subject: [16/18] acpi: Disable ACPI table override if securelevel is set
-Origin: https://github.com/mjg59/linux/commit/a4a5ed2835e8ea042868b7401dced3f517cafa76
+Subject: [PATCH 15/19] acpi: Disable ACPI table override if securelevel is set
+Origin: https://git.kernel.org/cgit/linux/kernel/git/jforbes/linux.git/commit?id=4321971d7ae760803e436f7b286a6c4f4f69ac68
 
 From the kernel documentation (initrd_table_override.txt):
 
@@ -14,13 +14,13 @@ changes to kernel space. ACPI tables contain code invoked by the kernel, so
 do not allow ACPI tables to be overridden if securelevel is set.
 
 Signed-off-by: Linn Crosetto <linn@hpe.com>
-[bwh: Forward-ported to 4.7: ACPI override code moved to drivers/acpi/tables.c]
-[bwh: Forward-ported to 4.9: adjust context]
 ---
  arch/x86/kernel/setup.c | 12 ++++++------
- drivers/acpi/tables.c   |  6 ++++++
- 2 files changed, 12 insertions(+), 6 deletions(-)
+ drivers/acpi/tables.c   |  7 +++++++
+ 2 files changed, 13 insertions(+), 6 deletions(-)
 
+diff --git a/arch/x86/kernel/setup.c b/arch/x86/kernel/setup.c
+index 8fc38e773983..1e34e607ba8a 100644
 --- a/arch/x86/kernel/setup.c
 +++ b/arch/x86/kernel/setup.c
 @@ -1153,6 +1153,12 @@ void __init setup_arch(char **cmdline_p)
@@ -49,6 +49,8 @@ Signed-off-by: Linn Crosetto <linn@hpe.com>
  	/*
  	 * Parse the ACPI tables for possible boot-time SMP configuration.
  	 */
+diff --git a/drivers/acpi/tables.c b/drivers/acpi/tables.c
+index cdd56c4657e0..1d493f12eea6 100644
 --- a/drivers/acpi/tables.c
 +++ b/drivers/acpi/tables.c
 @@ -35,6 +35,7 @@

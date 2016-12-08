@@ -1,8 +1,8 @@
 From: Matthew Garrett <mjg59@srcf.ucam.org>
 Date: Fri, 9 Aug 2013 18:36:30 -0400
-Subject: [12/18] Add option to automatically set securelevel when in Secure
- Boot mode
-Origin: https://github.com/mjg59/linux/commit/e324de2d053295670f3ba8ef67289835d663aae5
+Subject: [PATCH 11/19] Add option to automatically set securelevel when in
+ Secure Boot mode
+Origin: https://git.kernel.org/cgit/linux/kernel/git/jforbes/linux.git/commit?id=6dad5c87099c433fc3ff18b8857f9cdf9ff456b7
 
 UEFI Secure Boot provides a mechanism for ensuring that the firmware will
 only load signed bootloaders and kernels. Certain use cases may also
@@ -19,6 +19,8 @@ Signed-off-by: Matthew Garrett <mjg59@srcf.ucam.org>
  arch/x86/kernel/setup.c               |  7 +++++++
  5 files changed, 60 insertions(+), 1 deletion(-)
 
+diff --git a/Documentation/x86/zero-page.txt b/Documentation/x86/zero-page.txt
+index 95a4d34af3fd..b8527c6b7646 100644
 --- a/Documentation/x86/zero-page.txt
 +++ b/Documentation/x86/zero-page.txt
 @@ -31,6 +31,8 @@ Offset	Proto	Name		Meaning
@@ -30,9 +32,11 @@ Signed-off-by: Matthew Garrett <mjg59@srcf.ucam.org>
  1EF/001	ALL	sentinel	Used to detect broken bootloaders
  290/040	ALL	edd_mbr_sig_buffer EDD MBR signatures
  2D0/A00	ALL	e820_map	E820 memory map table
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index bada636d1065..83e7e2b8b064 100644
 --- a/arch/x86/Kconfig
 +++ b/arch/x86/Kconfig
-@@ -1754,6 +1754,19 @@ config EFI_MIXED
+@@ -1786,6 +1786,19 @@ config EFI_MIXED
  
  	   If unsure, say N.
  
@@ -52,6 +56,8 @@ Signed-off-by: Matthew Garrett <mjg59@srcf.ucam.org>
  config SECCOMP
  	def_bool y
  	prompt "Enable seccomp to safely compute untrusted bytecode"
+diff --git a/arch/x86/boot/compressed/eboot.c b/arch/x86/boot/compressed/eboot.c
+index cc69e37548db..4a7d64ef7268 100644
 --- a/arch/x86/boot/compressed/eboot.c
 +++ b/arch/x86/boot/compressed/eboot.c
 @@ -12,6 +12,7 @@
@@ -62,7 +68,7 @@ Signed-off-by: Matthew Garrett <mjg59@srcf.ucam.org>
  
  #include "../string.h"
  #include "eboot.h"
-@@ -1050,6 +1051,37 @@ void setup_graphics(struct boot_params *
+@@ -710,6 +711,37 @@ void setup_graphics(struct boot_params *boot_params)
  	}
  }
  
@@ -100,7 +106,7 @@ Signed-off-by: Matthew Garrett <mjg59@srcf.ucam.org>
  /*
   * Because the x86 boot code expects to be passed a boot_params we
   * need to create one ourselves (usually the bootloader would create
-@@ -1432,6 +1464,10 @@ struct boot_params *efi_main(struct efi_
+@@ -1094,6 +1126,10 @@ struct boot_params *efi_main(struct efi_config *c,
  	else
  		setup_boot_services32(efi_early);
  
@@ -111,6 +117,8 @@ Signed-off-by: Matthew Garrett <mjg59@srcf.ucam.org>
  	setup_graphics(boot_params);
  
  	setup_efi_pci(boot_params);
+diff --git a/arch/x86/include/uapi/asm/bootparam.h b/arch/x86/include/uapi/asm/bootparam.h
+index c18ce67495fa..2b3e5427097b 100644
 --- a/arch/x86/include/uapi/asm/bootparam.h
 +++ b/arch/x86/include/uapi/asm/bootparam.h
 @@ -134,7 +134,8 @@ struct boot_params {
@@ -123,6 +131,8 @@ Signed-off-by: Matthew Garrett <mjg59@srcf.ucam.org>
  	/*
  	 * The sentinel is set to a nonzero value (0xff) in header.S.
  	 *
+diff --git a/arch/x86/kernel/setup.c b/arch/x86/kernel/setup.c
+index 9c337b0e8ba7..8fc38e773983 100644
 --- a/arch/x86/kernel/setup.c
 +++ b/arch/x86/kernel/setup.c
 @@ -50,6 +50,7 @@
@@ -133,7 +143,7 @@ Signed-off-by: Matthew Garrett <mjg59@srcf.ucam.org>
  
  #include <linux/errno.h>
  #include <linux/kernel.h>
-@@ -1145,6 +1146,12 @@ void __init setup_arch(char **cmdline_p)
+@@ -1160,6 +1161,12 @@ void __init setup_arch(char **cmdline_p)
  
  	io_delay_init();
  

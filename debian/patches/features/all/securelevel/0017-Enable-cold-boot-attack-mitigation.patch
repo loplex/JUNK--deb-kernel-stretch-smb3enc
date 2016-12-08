@@ -1,17 +1,17 @@
 From: Matthew Garrett <mjg59@coreos.com>
 Date: Tue, 12 Jan 2016 12:51:27 -0800
-Subject: [18/18] Enable cold boot attack mitigation
-Origin: https://github.com/mjg59/linux/commit/02d999574936dd234a508c0112a0200c135a5c34
+Subject: [PATCH 17/19] Enable cold boot attack mitigation
+Origin: https://git.kernel.org/cgit/linux/kernel/git/jforbes/linux.git/commit?id=cbf6c70b2b4d3ae472606e124ce75fd2f376f8df
 
 ---
  arch/x86/boot/compressed/eboot.c | 22 ++++++++++++++++++++++
  1 file changed, 22 insertions(+)
 
 diff --git a/arch/x86/boot/compressed/eboot.c b/arch/x86/boot/compressed/eboot.c
-index 28c24d80d0a0..b0413ba639af 100644
+index e042f00cd9f7..715ccf95a430 100644
 --- a/arch/x86/boot/compressed/eboot.c
 +++ b/arch/x86/boot/compressed/eboot.c
-@@ -1051,6 +1051,22 @@ void setup_graphics(struct boot_params *boot_params)
+@@ -711,6 +711,22 @@ void setup_graphics(struct boot_params *boot_params)
  	}
  }
  
@@ -34,7 +34,7 @@ index 28c24d80d0a0..b0413ba639af 100644
  static int get_secure_boot(void)
  {
  	u8 sb, setup, moksbstate;
-@@ -1482,6 +1498,12 @@ struct boot_params *efi_main(struct efi_config *c,
+@@ -1144,6 +1160,12 @@ struct boot_params *efi_main(struct efi_config *c,
  	else
  		setup_boot_services32(efi_early);
  

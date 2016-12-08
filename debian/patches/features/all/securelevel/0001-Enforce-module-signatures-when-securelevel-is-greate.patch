@@ -1,7 +1,8 @@
 From: Matthew Garrett <mjg59@srcf.ucam.org>
 Date: Mon, 9 Sep 2013 08:46:52 -0400
-Subject: [02/18] Enforce module signatures when securelevel is greater than 0
-Origin: https://github.com/mjg59/linux/commit/90e0fa532b145d1bb76c368277a3a3e3b3eb5c94
+Subject: [PATCH 01/19] Enforce module signatures when securelevel is greater
+ than 0
+Origin: https://git.kernel.org/cgit/linux/kernel/git/jforbes/linux.git/commit?id=ff7c4944a41d7034aa1129e29410741fabd3f393
 
 If securelevel has been set to 1 or greater, require that all modules have
 valid signatures.
@@ -11,9 +12,11 @@ Signed-off-by: Matthew Garrett <mjg59@srcf.ucam.org>
  kernel/module.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/kernel/module.c b/kernel/module.c
+index f57dd63186e6..e45b8b84f928 100644
 --- a/kernel/module.c
 +++ b/kernel/module.c
-@@ -2616,7 +2616,7 @@ static int module_sig_check(struct load_
+@@ -2744,7 +2744,7 @@ static int module_sig_check(struct load_info *info, int flags)
  	}
  
  	/* Not having a signature is only an error if we're strict. */

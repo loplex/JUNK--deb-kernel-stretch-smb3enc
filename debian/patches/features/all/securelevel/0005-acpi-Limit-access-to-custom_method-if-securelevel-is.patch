@@ -1,7 +1,8 @@
 From: Matthew Garrett <mjg59@srcf.ucam.org>
 Date: Fri, 9 Mar 2012 08:39:37 -0500
-Subject: [06/18] acpi: Limit access to custom_method if securelevel is set
-Origin: https://github.com/mjg59/linux/commit/3cdc48db6b6d1b3cc1412d428389889f74cafe83
+Subject: [PATCH 05/19] acpi: Limit access to custom_method if securelevel is
+ set
+Origin: https://git.kernel.org/cgit/linux/kernel/git/jforbes/linux.git/commit?id=00513d16efa1908205f52ede03af3947ca87a735
 
 custom_method effectively allows arbitrary access to system memory, making
 it possible for an attacker to modify the kernel at runtime. Prevent this

@@ -1,21 +1,23 @@
 From: Matthew Garrett <mjg59@srcf.ucam.org>
 Date: Fri, 9 Mar 2012 09:28:15 -0500
-Subject: [05/18] Restrict /dev/mem and /dev/kmem when securelevel is set.
-Origin: https://github.com/mjg59/linux/commit/401996625d478c814fe9e736ca9e6c5c5f055f06
+Subject: [PATCH 04/19] Restrict /dev/mem and /dev/kmem when securelevel is
+ set.
+Origin: https://git.kernel.org/cgit/linux/kernel/git/jforbes/linux.git/commit?id=a74d4e4cc405d964b12824a705df48376beff199
 
 Allowing users to write to address space provides mechanisms that may permit
 modification of the kernel at runtime. Prevent this if securelevel has been
 set.
 
 Signed-off-by: Matthew Garrett <mjg59@srcf.ucam.org>
-[bwh: Forward-ported to 4.9: adjust context]
 ---
  drivers/char/mem.c | 6 ++++++
  1 file changed, 6 insertions(+)
 
+diff --git a/drivers/char/mem.c b/drivers/char/mem.c
+index e2f4d57b9eab..6afd9a8e3cb7 100644
 --- a/drivers/char/mem.c
 +++ b/drivers/char/mem.c
-@@ -164,6 +164,9 @@ static ssize_t write_mem(struct file *fi
+@@ -164,6 +164,9 @@ static ssize_t write_mem(struct file *file, const char __user *buf,
  	if (p != *ppos)
  		return -EFBIG;
  
@@ -25,7 +27,7 @@ Signed-off-by: Matthew Garrett <mjg59@srcf.ucam.org>
  	if (!valid_phys_addr_range(p, count))
  		return -EFAULT;
  
-@@ -513,6 +516,9 @@ static ssize_t write_kmem(struct file *f
+@@ -513,6 +516,9 @@ static ssize_t write_kmem(struct file *file, const char __user *buf,
  	char *kbuf; /* k-addr because vwrite() takes vmlist_lock rwlock */
  	int err = 0;
  

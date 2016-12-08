@@ -1,0 +1,80 @@
+From: joeyli <jlee@suse.com>
+Date: Sun, 13 Nov 2016 00:03:25 +0800
+Subject: [PATCH 19/19] More secure boot holes to plug
+Origin: https://git.kernel.org/cgit/linux/kernel/git/jforbes/linux.git/commit?id=497e7895e4669b2d35368e40bcc8e7932893e490
+
+Hi all,
+
+On Fri, Nov 04, 2016 at 04:42:13PM -0600, Kees Cook wrote:
+> Hi,
+>
+> It looks like CONFIG_BPF_EVENTS needs to be disabled in secure boot
+> environments since you can read kernel memory (and hence, the
+> hibernation image signing key) by attaching an eBPF program to a
+> tracepoint through a perf_event_open() fd which uses bpf_probe_read()
+> and either bpf_trace_printk() or bpf_probe_write_user().
+>
+> (Or, rather, kernel memory _reads_ need to be added to the threat
+> model if a private key is held in kernel memory.)
+>
+> -Kees
+>
+
+Here is a patch to restrict some bpf read functions. Actually not just
+bpf, currently securelevel patches do not prevent root account to read
+memory. e.g. /dev/mem and /dev/kmem.
+
+If kernel allows root to read kernel memory, then hibernation needs to be
+totally disabled.
+
+>From 69f142a5ea1073c6e0ba0dc612a5e6f83a5ab701 Mon Sep 17 00:00:00 2001
+From: "Lee, Chun-Yi" <jlee@suse.com>
+Date: Sat, 12 Nov 2016 23:15:13 +0800
+Subject: [PATCH] bpf: Restrict read functions when securelevel is set
+
+There have some bpf functions can be used to read kernel memory:
+bpf_probe_read, bpf_probe_write_user and bpf_trace_printk. Then private
+key in kernel memory (e.g. hibernation image signing key) can be read
+by a eBPF program. So restricting those functions in secure mode.
+
+Signed-off-by: Lee, Chun-Yi <jlee@suse.com>
+---
+ kernel/trace/bpf_trace.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/kernel/trace/bpf_trace.c b/kernel/trace/bpf_trace.c
+index 5dcb99281259..4beea12e3109 100644
+--- a/kernel/trace/bpf_trace.c
++++ b/kernel/trace/bpf_trace.c
+@@ -65,6 +65,11 @@ BPF_CALL_3(bpf_probe_read, void *, dst, u32, size, const void *, unsafe_ptr)
+ {
+ 	int ret;
+ 
++	if (get_securelevel() > 0) {
++		memset(dst, 0, size);
++		return -EPERM;
++	}
++
+ 	ret = probe_kernel_read(dst, unsafe_ptr, size);
+ 	if (unlikely(ret < 0))
+ 		memset(dst, 0, size);
+@@ -84,6 +89,9 @@ static const struct bpf_func_proto bpf_probe_read_proto = {
+ BPF_CALL_3(bpf_probe_write_user, void *, unsafe_ptr, const void *, src,
+ 	   u32, size)
+ {
++	if (get_securelevel() > 0)
++		return -EPERM;
++
+ 	/*
+ 	 * Ensure we're in user context which is safe for the helper to
+ 	 * run. This helper has no business in a kthread.
+@@ -143,6 +151,9 @@ BPF_CALL_5(bpf_trace_printk, char *, fmt, u32, fmt_size, u64, arg1,
+ 	if (fmt[--fmt_size] != 0)
+ 		return -EINVAL;
+ 
++	if (get_securelevel() > 0)
++		return __trace_printk(1, fmt, 0, 0, 0);
++
+ 	/* check format string for allowed specifiers */
+ 	for (i = 0; i < fmt_size; i++) {
+ 		if ((!isprint(fmt[i]) && !isspace(fmt[i])) || !isascii(fmt[i]))

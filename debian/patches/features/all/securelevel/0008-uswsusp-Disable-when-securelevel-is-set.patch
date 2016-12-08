@@ -1,7 +1,7 @@
 From: Matthew Garrett <mjg59@srcf.ucam.org>
 Date: Tue, 3 Sep 2013 11:23:29 -0400
-Subject: [09/18] uswsusp: Disable when securelevel is set
-Origin: https://github.com/mjg59/linux/commit/504f45f7cc9b4265a4d89728c4f8254295e81977
+Subject: [PATCH 08/19] uswsusp: Disable when securelevel is set
+Origin: https://git.kernel.org/cgit/linux/kernel/git/jforbes/linux.git/commit?id=6b026a80916d302e52d17fb5cacbe8ed201a825c
 
 uswsusp allows a user process to dump and then restore kernel state, which
 makes it possible to modify the running kernel. Disable this if securelevel
@@ -13,7 +13,7 @@ Signed-off-by: Matthew Garrett <mjg59@srcf.ucam.org>
  1 file changed, 4 insertions(+)
 
 diff --git a/kernel/power/user.c b/kernel/power/user.c
-index 526e8911460a..40618bf41620 100644
+index 35310b627388..d1b274d7c49d 100644
 --- a/kernel/power/user.c
 +++ b/kernel/power/user.c
 @@ -24,6 +24,7 @@

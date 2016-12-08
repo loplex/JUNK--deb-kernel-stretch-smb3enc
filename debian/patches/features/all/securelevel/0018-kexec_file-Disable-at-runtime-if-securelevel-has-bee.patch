@@ -1,0 +1,46 @@
+From: "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
+Date: Tue, 14 Jun 2016 17:24:03 +0800
+Subject: [PATCH 18/19] kexec_file: Disable at runtime if securelevel has been
+ set
+Origin: https://git.kernel.org/cgit/linux/kernel/git/jforbes/linux.git/commit?id=1194d6e47cd83252892ba0ce30fdf052f1c9aceb
+
+When KEXEC_VERIFY_SIG is not enabled, kernel should not loads image
+through kexec_file systemcall if securelevel has been set.
+
+This code was showed in Matthew's patch but not in git:
+https://lkml.org/lkml/2015/3/13/778
+
+Cc: Matthew Garrett <mjg59@srcf.ucam.org>
+Signed-off-by: Lee, Chun-Yi <jlee@suse.com>
+---
+ kernel/kexec_file.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/kernel/kexec_file.c b/kernel/kexec_file.c
+index 037c321c5618..75cb22203224 100644
+--- a/kernel/kexec_file.c
++++ b/kernel/kexec_file.c
+@@ -23,6 +23,7 @@
+ #include <crypto/sha.h>
+ #include <linux/syscalls.h>
+ #include <linux/vmalloc.h>
++#include <linux/security.h>
+ #include "kexec_internal.h"
+ 
+ /*
+@@ -264,6 +265,15 @@ SYSCALL_DEFINE5(kexec_file_load, int, kernel_fd, int, initrd_fd,
+ 	if (!capable(CAP_SYS_BOOT) || kexec_load_disabled)
+ 		return -EPERM;
+ 
++#ifndef CONFIG_KEXEC_VERIFY_SIG
++	/*
++	 * Don't permit images to be loaded into trusted kernels if we're not
++	 * going to verify the signature on them
++	 */
++	if (get_securelevel() > 0)
++		return -EPERM;
++#endif
++
+ 	/* Make sure we have a legal set of flags */
+ 	if (flags != (flags & KEXEC_FILE_FLAGS))
+ 		return -EINVAL;

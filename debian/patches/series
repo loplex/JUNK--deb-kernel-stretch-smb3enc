@@ -66,28 +66,25 @@ bugfix/all/mm-memcontrol-use-special-workqueue-for-creating-per-memcg-caches.pat
 # Miscellaneous features
 
 # Securelevel patchset from mjg59
-features/all/securelevel/add-bsd-style-securelevel-support.patch
-features/all/securelevel/enforce-module-signatures-when-securelevel-is-greate.patch
-features/all/securelevel/pci-lock-down-bar-access-when-securelevel-is-enabled.patch
-features/all/securelevel/x86-lock-down-io-port-access-when-securelevel-is-ena.patch
-features/all/securelevel/restrict-dev-mem-and-dev-kmem-when-securelevel-is-se.patch
-features/all/securelevel/acpi-limit-access-to-custom_method-if-securelevel-is.patch
-features/all/securelevel/acpi-ignore-acpi_rsdp-kernel-parameter-when-securele.patch
-features/all/securelevel/kexec-disable-at-runtime-if-securelevel-has-been-set.patch
-features/all/securelevel/uswsusp-disable-when-securelevel-is-set.patch
-features/all/securelevel/x86-restrict-msr-access-when-securelevel-is-set.patch
-features/all/securelevel/asus-wmi-restrict-debugfs-interface-when-securelevel.patch
-features/all/securelevel/add-option-to-automatically-set-securelevel-when-in-.patch
-features/all/securelevel/efi-disable-secure-boot-if-shim-is-in-insecure-mode.patch
-features/all/securelevel/hibernate-disable-when-securelevel-is-set.patch
-features/all/securelevel/kexec-uefi-copy-secure_boot-flag-in-boot-params-acro.patch
-features/all/securelevel/acpi-disable-acpi-table-override-if-securelevel-is-s.patch
-features/all/securelevel/acpi-disable-apei-error-injection-if-securelevel-is-.patch
-features/all/securelevel/enable-cold-boot-attack-mitigation.patch
-features/all/securelevel/mtd-disable-slram-and-phram-when-securelevel-is-enabled.patch
-# same for arm64
-features/all/securelevel/arm64-efi-disable-secure-boot-if-shim-is-in-insecure.patch
-features/all/securelevel/arm64-add-kernel-config-option-to-set-securelevel-wh.patch
+features/all/securelevel/0001-Enforce-module-signatures-when-securelevel-is-greate.patch
+features/all/securelevel/0002-PCI-Lock-down-BAR-access-when-securelevel-is-enabled.patch
+features/all/securelevel/0003-x86-Lock-down-IO-port-access-when-securelevel-is-ena.patch
+features/all/securelevel/0004-Restrict-dev-mem-and-dev-kmem-when-securelevel-is-se.patch
+features/all/securelevel/0005-acpi-Limit-access-to-custom_method-if-securelevel-is.patch
+features/all/securelevel/0006-acpi-Ignore-acpi_rsdp-kernel-parameter-when-securele.patch
+features/all/securelevel/0007-kexec-Disable-at-runtime-if-securelevel-has-been-set.patch
+features/all/securelevel/0008-uswsusp-Disable-when-securelevel-is-set.patch
+features/all/securelevel/0009-x86-Restrict-MSR-access-when-securelevel-is-set.patch
+features/all/securelevel/0010-asus-wmi-Restrict-debugfs-interface-when-securelevel.patch
+features/all/securelevel/0011-Add-option-to-automatically-set-securelevel-when-in-.patch
+features/all/securelevel/0012-efi-Disable-secure-boot-if-shim-is-in-insecure-mode.patch
+features/all/securelevel/0013-hibernate-Disable-when-securelevel-is-set.patch
+features/all/securelevel/0014-kexec-uefi-copy-secure_boot-flag-in-boot-params-acro.patch
+features/all/securelevel/0015-acpi-Disable-ACPI-table-override-if-securelevel-is-s.patch
+features/all/securelevel/0016-acpi-Disable-APEI-error-injection-if-securelevel-is-.patch
+features/all/securelevel/0017-Enable-cold-boot-attack-mitigation.patch
+features/all/securelevel/0018-kexec_file-Disable-at-runtime-if-securelevel-has-bee.patch
+features/all/securelevel/0019-More-secure-boot-holes-to-plug.patch
 
 # Security fixes
 bugfix/all/ptrace-being-capable-wrt-a-process-requires-mapped-uids-gids.patch

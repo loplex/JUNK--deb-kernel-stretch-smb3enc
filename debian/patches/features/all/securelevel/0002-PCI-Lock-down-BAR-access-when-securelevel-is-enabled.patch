@@ -1,7 +1,7 @@
 From: Matthew Garrett <mjg59@srcf.ucam.org>
 Date: Thu, 8 Mar 2012 10:10:38 -0500
-Subject: [03/18] PCI: Lock down BAR access when securelevel is enabled
-Origin: https://github.com/mjg59/linux/commit/2533a3844cf8c43bf58b653334f8925cd1e7d405
+Subject: [PATCH 02/19] PCI: Lock down BAR access when securelevel is enabled
+Origin: https://git.kernel.org/cgit/linux/kernel/git/jforbes/linux.git/commit?id=07a1f45d1b12bfe40d59ab86153e3282b21c5690
 
 Any hardware that can potentially generate DMA has to be locked down from
 userspace in order to avoid it being possible for an attacker to modify
@@ -16,9 +16,11 @@ Signed-off-by: Matthew Garrett <mjg59@srcf.ucam.org>
  drivers/pci/syscall.c   | 3 ++-
  3 files changed, 19 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/pci/pci-sysfs.c b/drivers/pci/pci-sysfs.c
+index bcd10c795284..0183f9b3583d 100644
 --- a/drivers/pci/pci-sysfs.c
 +++ b/drivers/pci/pci-sysfs.c
-@@ -716,6 +716,9 @@ static ssize_t pci_write_config(struct f
+@@ -716,6 +716,9 @@ static ssize_t pci_write_config(struct file *filp, struct kobject *kobj,
  	loff_t init_off = off;
  	u8 *data = (u8 *) buf;
  
@@ -28,7 +30,7 @@ Signed-off-by: Matthew Garrett <mjg59@srcf.ucam.org>
  	if (off > dev->cfg_size)
  		return 0;
  	if (off + count > dev->cfg_size) {
-@@ -1007,6 +1010,9 @@ static int pci_mmap_resource(struct kobj
+@@ -1007,6 +1010,9 @@ static int pci_mmap_resource(struct kobject *kobj, struct bin_attribute *attr,
  	resource_size_t start, end;
  	int i;
  
@@ -38,7 +40,7 @@ Signed-off-by: Matthew Garrett <mjg59@srcf.ucam.org>
  	for (i = 0; i < PCI_ROM_RESOURCE; i++)
  		if (res == &pdev->resource[i])
  			break;
-@@ -1106,6 +1112,9 @@ static ssize_t pci_write_resource_io(str
+@@ -1106,6 +1112,9 @@ static ssize_t pci_write_resource_io(struct file *filp, struct kobject *kobj,
  				     struct bin_attribute *attr, char *buf,
  				     loff_t off, size_t count)
  {
@@ -48,6 +50,8 @@ Signed-off-by: Matthew Garrett <mjg59@srcf.ucam.org>
  	return pci_resource_io(filp, kobj, attr, buf, off, count, true);
  }
  
+diff --git a/drivers/pci/proc.c b/drivers/pci/proc.c
+index 2408abe4ee8c..27d466a85e5c 100644
 --- a/drivers/pci/proc.c
 +++ b/drivers/pci/proc.c
 @@ -11,6 +11,7 @@
@@ -58,7 +62,7 @@ Signed-off-by: Matthew Garrett <mjg59@srcf.ucam.org>
  #include <asm/uaccess.h>
  #include <asm/byteorder.h>
  #include "pci.h"
-@@ -116,6 +117,9 @@ static ssize_t proc_bus_pci_write(struct
+@@ -116,6 +117,9 @@ static ssize_t proc_bus_pci_write(struct file *file, const char __user *buf,
  	int size = dev->cfg_size;
  	int cnt;
  
@@ -68,7 +72,7 @@ Signed-off-by: Matthew Garrett <mjg59@srcf.ucam.org>
  	if (pos >= size)
  		return 0;
  	if (nbytes >= size)
-@@ -195,6 +199,9 @@ static long proc_bus_pci_ioctl(struct fi
+@@ -195,6 +199,9 @@ static long proc_bus_pci_ioctl(struct file *file, unsigned int cmd,
  #endif /* HAVE_PCI_MMAP */
  	int ret = 0;
  
@@ -78,7 +82,7 @@ Signed-off-by: Matthew Garrett <mjg59@srcf.ucam.org>
  	switch (cmd) {
  	case PCIIOC_CONTROLLER:
  		ret = pci_domain_nr(dev->bus);
-@@ -233,7 +240,7 @@ static int proc_bus_pci_mmap(struct file
+@@ -233,7 +240,7 @@ static int proc_bus_pci_mmap(struct file *file, struct vm_area_struct *vma)
  	struct pci_filp_private *fpriv = file->private_data;
  	int i, ret, write_combine;
  
@@ -87,6 +91,8 @@ Signed-off-by: Matthew Garrett <mjg59@srcf.ucam.org>
  		return -EPERM;
  
  	/* Make sure the caller is mapping a real resource for this device */
+diff --git a/drivers/pci/syscall.c b/drivers/pci/syscall.c
+index b91c4da68365..9449bdef323a 100644
 --- a/drivers/pci/syscall.c
 +++ b/drivers/pci/syscall.c
 @@ -10,6 +10,7 @@
@@ -97,7 +103,7 @@ Signed-off-by: Matthew Garrett <mjg59@srcf.ucam.org>
  #include <asm/uaccess.h>
  #include "pci.h"
  
-@@ -92,7 +93,7 @@ SYSCALL_DEFINE5(pciconfig_write, unsigne
+@@ -92,7 +93,7 @@ SYSCALL_DEFINE5(pciconfig_write, unsigned long, bus, unsigned long, dfn,
  	u32 dword;
  	int err = 0;
  

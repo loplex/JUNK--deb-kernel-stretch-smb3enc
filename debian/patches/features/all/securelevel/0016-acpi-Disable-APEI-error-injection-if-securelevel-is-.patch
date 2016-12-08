@@ -1,7 +1,8 @@
 From: Linn Crosetto <linn@hpe.com>
 Date: Wed, 16 Mar 2016 14:43:33 -0600
-Subject: [17/18] acpi: Disable APEI error injection if securelevel is set
-Origin: https://github.com/mjg59/linux/commit/d7a6be58edc01b1c66ecd8fcc91236bfbce0a420
+Subject: [PATCH 16/19] acpi: Disable APEI error injection if securelevel is
+ set
+Origin: https://git.kernel.org/cgit/linux/kernel/git/jforbes/linux.git/commit?id=91bfdd6ea1b4e86b87b537c879f07ef46f04ad30
 
 ACPI provides an error injection mechanism, EINJ, for debugging and testing
 the ACPI Platform Error Interface (APEI) and other RAS features. If
@@ -23,6 +24,8 @@ Signed-off-by: Linn Crosetto <linn@hpe.com>
  drivers/acpi/apei/einj.c | 4 ++++
  1 file changed, 4 insertions(+)
 
+diff --git a/drivers/acpi/apei/einj.c b/drivers/acpi/apei/einj.c
+index eebb7e39c49c..604d9ff5c227 100644
 --- a/drivers/acpi/apei/einj.c
 +++ b/drivers/acpi/apei/einj.c
 @@ -29,6 +29,7 @@
@@ -33,7 +36,7 @@ Signed-off-by: Linn Crosetto <linn@hpe.com>
  #include <asm/unaligned.h>
  
  #include "apei-internal.h"
-@@ -521,6 +522,9 @@ static int einj_error_inject(u32 type, u
+@@ -518,6 +519,9 @@ static int einj_error_inject(u32 type, u32 flags, u64 param1, u64 param2,
  	int rc;
  	u64 base_addr, size;
  

@@ -1,7 +1,7 @@
 From: Matthew Garrett <mjg59@srcf.ucam.org>
 Date: Fri, 8 Feb 2013 11:12:13 -0800
-Subject: [10/18] x86: Restrict MSR access when securelevel is set
-Origin: https://github.com/mjg59/linux/commit/c6ad37822699967e60fae57a64ae89676f543182
+Subject: [PATCH 09/19] x86: Restrict MSR access when securelevel is set
+Origin: https://git.kernel.org/cgit/linux/kernel/git/jforbes/linux.git/commit?id=89878527852b643f9018a013c4de6971ffca717a
 
 Permitting write access to MSRs allows userspace to modify the running
 kernel. Prevent this if securelevel has been set. Based on a patch by Kees
@@ -13,6 +13,8 @@ Signed-off-by: Matthew Garrett <mjg59@srcf.ucam.org>
  arch/x86/kernel/msr.c | 8 ++++++++
  1 file changed, 8 insertions(+)
 
+diff --git a/arch/x86/kernel/msr.c b/arch/x86/kernel/msr.c
+index 7f3550acde1b..531d8dbc955d 100644
 --- a/arch/x86/kernel/msr.c
 +++ b/arch/x86/kernel/msr.c
 @@ -39,6 +39,7 @@
@@ -23,7 +25,7 @@ Signed-off-by: Matthew Garrett <mjg59@srcf.ucam.org>
  
  #include <asm/cpufeature.h>
  #include <asm/msr.h>
-@@ -83,6 +84,9 @@ static ssize_t msr_write(struct file *fi
+@@ -83,6 +84,9 @@ static ssize_t msr_write(struct file *file, const char __user *buf,
  	int err = 0;
  	ssize_t bytes = 0;
  
@@ -33,7 +35,7 @@ Signed-off-by: Matthew Garrett <mjg59@srcf.ucam.org>
  	if (count % 8)
  		return -EINVAL;	/* Invalid chunk size */
  
-@@ -130,6 +134,10 @@ static long msr_ioctl(struct file *file,
+@@ -130,6 +134,10 @@ static long msr_ioctl(struct file *file, unsigned int ioc, unsigned long arg)
  			err = -EBADF;
  			break;
  		}
