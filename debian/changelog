@@ -486,6 +486,8 @@ linux (3.16.39-1) UNRELEASED; urgency=medium
     avoid ABI change
   * Revert "block: fix bdi vs gendisk lifetime mismatch" to avoid ABI change
   * fsnotify: Ignore ABI change in 3.16.39
+  * security,perf: Allow unprivileged use of perf_event_open to be disabled
+    (sysctl: kernel.perf_event_paranoid=3)
 
   [ Julien Cristau ]
   * hwrng: Add chaoskey driver, backported from 4.8 (Closes: #839616)
