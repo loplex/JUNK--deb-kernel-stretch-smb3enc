@@ -654,6 +654,14 @@ features/all/chaoskey/hwrng-chaoskey-Add-support-for-Araneus-Alea-I-USB-RN.patch
 features/all/chaoskey/hwrng-chaoskey-Fix-URB-warning-due-to-timeout-on-Ale.patch
 features/all/chaoskey/chaoskey-3.16-no-hwrng-quality.patch
 
+# seccomp for arm64
+features/arm64/seccomp/arm64-add-syscall_get_arch.patch
+features/arm64/seccomp/arm64-ptrace-add-nt_arm_system_call-regset.patch
+features/arm64/seccomp/arm64-ptrace-allow-tracer-to-skip-a-system-call.patch
+features/arm64/seccomp/asm-generic-add-generic-seccomp.h-for-secure-computi.patch
+features/arm64/seccomp/arm64-add-sigsys-siginfo-for-compat-task.patch
+features/arm64/seccomp/arm64-add-seccomp-support.patch
+
 # Security fixes
 
 # Fix ABI changes

@@ -1,0 +1,96 @@
+From: AKASHI Takahiro <takahiro.akashi@linaro.org>
+Date: Fri, 28 Nov 2014 05:26:34 +0000
+Subject: [1/6] arm64: ptrace: add NT_ARM_SYSTEM_CALL regset
+Origin: https://git.kernel.org/linus/766a85d7bc5d7f1ddd6de28bdb844eae45ec63b0
+Bug-Debian: https://bugs.debian.org/833183
+
+This regeset is intended to be used to get and set a system call number
+while tracing.
+There was some discussion about possible approaches to do so:
+
+(1) modify x8 register with ptrace(PTRACE_SETREGSET) indirectly,
+    and update regs->syscallno later on in syscall_trace_enter(), or
+(2) define a dedicated regset for this purpose as on s390, or
+(3) support ptrace(PTRACE_SET_SYSCALL) as on arch/arm
+
+Thinking of the fact that user_pt_regs doesn't expose 'syscallno' to
+tracer as well as that secure_computing() expects a changed syscall number,
+especially case of -1, to be visible before this function returns in
+syscall_trace_enter(), (1) doesn't work well.
+We will take (2) since it looks much cleaner.
+
+Signed-off-by: AKASHI Takahiro <takahiro.akashi@linaro.org>
+Signed-off-by: Will Deacon <will.deacon@arm.com>
+---
+ arch/arm64/kernel/ptrace.c | 35 +++++++++++++++++++++++++++++++++++
+ include/uapi/linux/elf.h   |  1 +
+ 2 files changed, 36 insertions(+)
+
+--- a/arch/arm64/kernel/ptrace.c
++++ b/arch/arm64/kernel/ptrace.c
+@@ -555,6 +555,32 @@ static int tls_set(struct task_struct *t
+ 	return ret;
+ }
+ 
++static int system_call_get(struct task_struct *target,
++			   const struct user_regset *regset,
++			   unsigned int pos, unsigned int count,
++			   void *kbuf, void __user *ubuf)
++{
++	int syscallno = task_pt_regs(target)->syscallno;
++
++	return user_regset_copyout(&pos, &count, &kbuf, &ubuf,
++				   &syscallno, 0, -1);
++}
++
++static int system_call_set(struct task_struct *target,
++			   const struct user_regset *regset,
++			   unsigned int pos, unsigned int count,
++			   const void *kbuf, const void __user *ubuf)
++{
++	int syscallno, ret;
++
++	ret = user_regset_copyin(&pos, &count, &kbuf, &ubuf, &syscallno, 0, -1);
++	if (ret)
++		return ret;
++
++	task_pt_regs(target)->syscallno = syscallno;
++	return ret;
++}
++
+ enum aarch64_regset {
+ 	REGSET_GPR,
+ 	REGSET_FPR,
+@@ -563,6 +589,7 @@ enum aarch64_regset {
+ 	REGSET_HW_BREAK,
+ 	REGSET_HW_WATCH,
+ #endif
++	REGSET_SYSTEM_CALL,
+ };
+ 
+ static const struct user_regset aarch64_regsets[] = {
+@@ -612,6 +639,14 @@ static const struct user_regset aarch64_
+ 		.set = hw_break_set,
+ 	},
+ #endif
++	[REGSET_SYSTEM_CALL] = {
++		.core_note_type = NT_ARM_SYSTEM_CALL,
++		.n = 1,
++		.size = sizeof(int),
++		.align = sizeof(int),
++		.get = system_call_get,
++		.set = system_call_set,
++	},
+ };
+ 
+ static const struct user_regset_view user_aarch64_view = {
+--- a/include/uapi/linux/elf.h
++++ b/include/uapi/linux/elf.h
+@@ -395,6 +395,7 @@ typedef struct elf64_shdr {
+ #define NT_ARM_TLS	0x401		/* ARM TLS register */
+ #define NT_ARM_HW_BREAK	0x402		/* ARM hardware breakpoint registers */
+ #define NT_ARM_HW_WATCH	0x403		/* ARM hardware watchpoint registers */
++#define NT_ARM_SYSTEM_CALL	0x404	/* ARM system call number */
+ #define NT_METAG_CBUF	0x500		/* Metag catch buffer registers */
+ #define NT_METAG_RPIPE	0x501		/* Metag read pipeline state */
+ #define NT_METAG_TLS	0x502		/* Metag TLS pointer */

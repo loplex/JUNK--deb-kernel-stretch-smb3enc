@@ -1,0 +1,48 @@
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Sun, 11 Dec 2016 21:38:32 +0000
+Subject: arm64: Add syscall_get_arch()
+Forwarded: not-needed
+Bug-Debian: https://bugs.debian.org/833183
+
+Extracted from commit 875cbf3e4614 ("arm64: Add audit support").
+
+---
+
+--- a/arch/arm64/include/asm/syscall.h
++++ b/arch/arm64/include/asm/syscall.h
+@@ -16,6 +16,8 @@
+ #ifndef __ASM_SYSCALL_H
+ #define __ASM_SYSCALL_H
+ 
++#include <uapi/linux/audit.h>
++#include <linux/compat.h>
+ #include <linux/err.h>
+ 
+ extern const void *sys_call_table[];
+@@ -105,4 +107,16 @@ static inline void syscall_set_arguments
+ 	memcpy(&regs->regs[i], args, n * sizeof(args[0]));
+ }
+ 
++/*
++ * We don't care about endianness (__AUDIT_ARCH_LE bit) here because
++ * AArch64 has the same system calls both on little- and big- endian.
++ */
++static inline int syscall_get_arch(void)
++{
++	if (is_compat_task())
++		return AUDIT_ARCH_ARM;
++
++	return AUDIT_ARCH_AARCH64;
++}
++
+ #endif	/* __ASM_SYSCALL_H */
+--- a/include/uapi/linux/audit.h
++++ b/include/uapi/linux/audit.h
+@@ -342,6 +342,7 @@ enum {
+ #define __AUDIT_ARCH_64BIT 0x80000000
+ #define __AUDIT_ARCH_LE	   0x40000000
+ 
++#define AUDIT_ARCH_AARCH64	(EM_AARCH64|__AUDIT_ARCH_64BIT|__AUDIT_ARCH_LE)
+ #define AUDIT_ARCH_ALPHA	(EM_ALPHA|__AUDIT_ARCH_64BIT|__AUDIT_ARCH_LE)
+ #define AUDIT_ARCH_ARM		(EM_ARM|__AUDIT_ARCH_LE)
+ #define AUDIT_ARCH_ARMEB	(EM_ARM)
