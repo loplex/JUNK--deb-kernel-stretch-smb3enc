@@ -1,0 +1,49 @@
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Sat, 10 Dec 2016 11:06:30 +0000
+Subject: ARM: Avoid ABI change when enabling seccomp
+Forwarded: not-needed
+
+seccomp state is embedded in struct task_struct.  The state is going
+to change from an empty struct to a meaningful struct on ARM.  For
+ABI compatibility we need to put it at the end and leave padding
+in its place.  (Even an empty struct takes 1 byte plus alignment.)
+
+Hide this hideous mess from genksyms.
+
+---
+--- a/include/linux/sched.h
++++ b/include/linux/sched.h
+@@ -1435,7 +1435,11 @@ struct task_struct {
+ 	kuid_t loginuid;
+ 	unsigned int sessionid;
+ #endif
++#if !(defined(CONFIG_ARM) || defined(CONFIG_ARM64)) || defined(__GENKSYMS__)
+ 	struct seccomp seccomp;
++#else
++	struct {} __seccomp_was_here;
++#endif
+ 
+ /* Thread group tracking */
+    	u32 parent_exec_id;
+@@ -1668,6 +1672,9 @@ struct task_struct {
+ 	unsigned int	sequential_io;
+ 	unsigned int	sequential_io_avg;
+ #endif
++#if (defined(CONFIG_ARM) || defined(CONFIG_ARM64)) && !defined(__GENKSYMS__)
++	struct seccomp seccomp;
++#endif
+ };
+ 
+ /* Future-safe accessor for struct task_struct's cpus_allowed. */
+--- a/include/linux/seccomp.h
++++ b/include/linux/seccomp.h
+@@ -3,7 +3,8 @@
+ 
+ #include <uapi/linux/seccomp.h>
+ 
+-#ifdef CONFIG_SECCOMP
++#if defined(CONFIG_SECCOMP) && \
++	!((defined(CONFIG_ARM) || defined(CONFIG_ARM64)) && defined(__GENKSYMS__))
+ 
+ #include <linux/thread_info.h>
+ #include <asm/seccomp.h>

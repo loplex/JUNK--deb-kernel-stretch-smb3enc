@@ -490,6 +490,7 @@ linux (3.16.39-1) UNRELEASED; urgency=medium
     (sysctl: kernel.perf_event_paranoid=3)
   * [arm64] Add __NR_* definitions for compat syscalls
   * [arm64] Add support for SECCOMP, backported from 3.19
+  * [arm*] Enable SECCOMP (Closes: #833183)
 
   [ Julien Cristau ]
   * hwrng: Add chaoskey driver, backported from 4.8 (Closes: #839616)

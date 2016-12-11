@@ -716,3 +716,4 @@ debian/uaccess-avoid-abi-change-in-3.16.39.patch
 debian/revert-arm64-define-at_vector_size_arch-for-arch_dlinfo.patch
 debian/revert-s390-define-at_vector_size_arch-for-arch_dlinfo.patch
 debian/revert-block-fix-bdi-vs-gendisk-lifetime-mismatch.patch
+debian/arm-avoid-abi-change-when-enabling-seccomp.patch
