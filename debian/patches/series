@@ -192,6 +192,7 @@ features/arm64/usb-make-xhci-platform-driver-use-64-bit-or-32-bit-dma.patch
 features/arm64/usb-add-support-for-acpi-identification-to-xhci-platform.patch
 features/x86/ie31200_edac-introduce-the-driver.patch
 features/x86/ie31200_edac-allocate-mci-and-map-mchbar-first.patch
+features/arm64/arm64-add-__nr_-definitions-for-compat-syscalls.patch
 
 # Miscellaneous bug fixes
 bugfix/all/kbuild-use-nostdinc-in-compile-tests.patch
